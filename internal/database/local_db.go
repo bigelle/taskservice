@@ -2,6 +2,7 @@ package database
 
 import (
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 )
@@ -53,16 +54,58 @@ func (d *LocalDB) View(taskID uint) (Task, error) {
 		}
 	}
 
-	return Task{}, fmt.Errorf("no tasks with id %d", taskID)
+	return Task{}, fmt.Errorf("no tasks with ID %d", taskID)
 }
 
-func (d *LocalDB) Update(taskID uint, task Task) (Task, error) {
-	// TODO:
-	return Task{}, nil
+func (d *LocalDB) UpdateStatus(taskID uint, status string) (Task, error) {
+	if taskID == 0 {
+		return Task{}, fmt.Errorf("task ID must not be empty")
+	}
+	if TaskStatusFromString(status) == StatusUndefined {
+		return Task{}, fmt.Errorf("undefined task status: %s", status)
+	}
+
+	for i := range d.Tasks {
+		if d.Tasks[i].ID == taskID {
+			if TaskStatusFromString(status) == d.Tasks[i].Status {
+				return d.Tasks[i], nil
+			}
+
+			d.Tasks[i].Status = TaskStatusFromString(status)
+			d.Tasks[i].UpdatedAt = time.Now()
+			return d.Tasks[i], nil
+		}
+	}
+
+	return Task{}, fmt.Errorf("no tasks with ID %d", taskID)
+}
+
+func (d *LocalDB) UpdateResult(taskID uint, result string) (Task, error) {
+	if taskID == 0 {
+		return Task{}, fmt.Errorf("task ID must not be empty")
+	}
+	if result == "" {
+		return Task{}, fmt.Errorf("result must not be empty")
+	}
+
+	for i := range d.Tasks {
+		if d.Tasks[i].ID == taskID {
+			d.Tasks[i].Result = &result
+			d.Tasks[i].UpdatedAt = time.Now()
+			return d.Tasks[i], nil
+		}
+	}
+
+	return Task{}, fmt.Errorf("no tasks with ID %d", taskID)
 }
 
 func (d *LocalDB) Delete(taskID uint) error {
-	// TODO:
+	if taskID == 0 {
+		return fmt.Errorf("task ID must not be empty")
+	}
+
+	d.Tasks = slices.DeleteFunc(d.Tasks, func(t Task) bool { return t.ID == taskID})
+	
 	return nil
 }
 

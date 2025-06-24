@@ -22,14 +22,16 @@ func NewDB() TaskDB {
 type TaskDB interface {
 	Create(name, desc string) (uint, error)
 	View(taskID uint) (Task, error)
-	Update(taskID uint, task Task) (Task, error)
+	UpdateStatus(taskID uint, status string) (Task, error)
+	UpdateResult(taskID uint, result string) (Task, error)
 	Delete(taskID uint) error
 }
 
 type TaskStatus int
 
 const (
-	StatusPending = iota
+	StatusUndefined = iota
+	StatusPending
 	StatusInProgress
 	StatusCancelled
 	StatusSuccess
@@ -37,17 +39,21 @@ const (
 )
 
 func (t TaskStatus) String() string {
-	return [...]string{"pending", "in_progress", "cancelled", "success", "fail"}[t]
+	return [...]string{"undefined", "pending", "in_progress", "cancelled", "success", "fail"}[t]
 }
 
-func (t *TaskStatus) FromString(str string) TaskStatus {
-	return map[string]TaskStatus{
+func TaskStatusFromString(str string) TaskStatus {
+	status, ok := map[string]TaskStatus{
 		"pending":     StatusPending,
 		"in_progress": StatusInProgress,
 		"cancelled":   StatusCancelled,
 		"success":     StatusSuccess,
 		"fail":        StatusFail,
 	}[str]
+	if !ok {
+		return StatusUndefined
+	}
+	return status
 }
 
 func (t TaskStatus) MarshalJSON() ([]byte, error) {
@@ -60,7 +66,7 @@ func (t *TaskStatus) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	*t = t.FromString(str)
+	*t = TaskStatusFromString(str)
 
 	return nil
 }

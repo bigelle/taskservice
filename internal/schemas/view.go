@@ -18,6 +18,7 @@ type Task struct {
 	Description string    `json:"description"`
 	Status      string    `json:"status"`
 	CreatedAt   time.Time `json:"created_at,omitzero"`
+	UpdatedAt   time.Time `json:"updated_at,omitzero"`
 	Result      string    `json:"result,omitempty"`
 	Took        string    `json:"took,omitempty"`
 }

@@ -8,15 +8,15 @@ import (
 	"github.com/bigelle/taskservice/internal/schemas"
 )
 
-func HandleCreate(w http.ResponseWriter, r *http.Request) {
+func HandleDelete(w http.ResponseWriter, r *http.Request) {
 	var err error
+	var req schemas.DeleteRequest
+	var resp schemas.DeleteResponse
 	db := database.NewDB()
-	var resp schemas.CreateResponse
 
-	var req schemas.CreateRequest
 	err = internal.ReadJSON(r, &req)
 	if err != nil {
-		resp = schemas.CreateResponse{
+		resp = schemas.DeleteResponse{
 			Ok:    false,
 			Error: "bad request",
 		}
@@ -24,13 +24,9 @@ func HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var taskID uint
-	taskID, err = db.Create(
-		req.TaskName,
-		req.TaskDesciption,
-	)
+	err = db.Delete(req.TaskID)
 	if err != nil {
-		resp = schemas.CreateResponse{
+		resp = schemas.DeleteResponse{
 			Ok:    false,
 			Error: "internal server error",
 		}
@@ -38,10 +34,6 @@ func HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp = schemas.CreateResponse{
-		Ok:       true,
-		TaskName: req.TaskName,
-		TaskID:   taskID,
-	}
+	resp = schemas.DeleteResponse{Ok: true}
 	internal.WriteJSON(w, http.StatusOK, resp)
 }

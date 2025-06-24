@@ -22,6 +22,7 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 			Error: "bad request",
 		}
 		internal.WriteJSON(w, http.StatusBadRequest, resp)
+		return
 	}
 
 	var task database.Task
@@ -32,6 +33,7 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 			Error: "internal server error",
 		}
 		internal.WriteJSON(w, http.StatusBadRequest, resp)
+		return
 	}
 
 	resp = schemas.ViewResponse{
@@ -41,6 +43,7 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 			Name:        task.Name,
 			Description: task.Description,
 			CreatedAt:   task.CreatedAt,
+			UpdatedAt:   task.UpdatedAt,
 			Status:      task.Status.String(),
 		},
 	}

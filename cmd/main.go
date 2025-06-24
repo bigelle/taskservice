@@ -12,6 +12,8 @@ func main() {
 	
 	mux.HandleFunc("/create", handlers.HandleCreate)
 	mux.HandleFunc("/view", handlers.HandleView)
+	mux.HandleFunc("/update", handlers.HandleUpdate)
+	mux.HandleFunc("/delete", handlers.HandleDelete)
 
 	slog.Error(http.ListenAndServe(":8080", mux).Error())
 }
