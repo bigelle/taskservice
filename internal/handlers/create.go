@@ -25,7 +25,6 @@ func HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	var taskID uint
 	taskID, err = db.Create(
-		req.CreatorName,
 		req.TaskName,
 		req.TaskDesciption,
 	)
