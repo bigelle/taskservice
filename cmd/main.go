@@ -10,10 +10,7 @@ import (
 func main() {
 	mux := http.NewServeMux()
 	
-	handlers := handlers.New()
-	for path, handler := range handlers {
-		mux.Handle(path, handler)
-	}
+	mux.HandleFunc("/create", handlers.HandleCreate)
 
 	slog.Error(http.ListenAndServe(":8080", mux).Error())
 }

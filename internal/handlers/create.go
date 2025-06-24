@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/bigelle/taskservice/internal"
@@ -9,24 +8,19 @@ import (
 	"github.com/bigelle/taskservice/internal/schemas"
 )
 
-type CreateHandler struct{}
-
-func (h CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func HandleCreate(w http.ResponseWriter, r *http.Request) {
 	var err error
 	db := database.NewDB()
-	dec := internal.NewDecoder(r.Body)
-	enc := json.NewEncoder(w)
-	var req schemas.CreateRequest
 	var resp schemas.CreateResponse
 
-	err = dec.Decode(&req)
+	var req schemas.CreateRequest
+	err = internal.ReadJSON(r, &req)
 	if err != nil {
 		resp = schemas.CreateResponse{
 			Ok:    false,
 			Error: "bad request",
 		}
-		w.WriteHeader(http.StatusBadRequest)
-		enc.Encode(resp)
+		internal.WriteJSON(w, http.StatusBadRequest, resp)
 	}
 
 	var taskID uint
@@ -40,8 +34,7 @@ func (h CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			Ok:    false,
 			Error: "internal server error",
 		}
-		w.WriteHeader(http.StatusInternalServerError)
-		enc.Encode(resp)
+		internal.WriteJSON(w, http.StatusInternalServerError, resp)
 	}
 
 	resp = schemas.CreateResponse{
@@ -49,6 +42,5 @@ func (h CreateHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		TaskName: req.TaskName,
 		TaskID:   taskID,
 	}
-	w.WriteHeader(http.StatusOK)
-	enc.Encode(resp)
+	internal.WriteJSON(w, http.StatusOK, resp)
 }
