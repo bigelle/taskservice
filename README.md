@@ -99,7 +99,9 @@ go run main.go localhost:8080/create -M POST --print-out --data '{"name": "foo",
 3. **Test the API:**
    ```bash
    # Using curl (or you can use whatever tool you prefer *blink*)
-   curl http://localhost:8080/create --data '{"name": "foo", "description": "literally foo"}'    ```
+   curl http://localhost:8080/create --data '{"name": "foo", "description": "literally foo"}'    
+   ```
+
 
 ## 📝 Development
 
