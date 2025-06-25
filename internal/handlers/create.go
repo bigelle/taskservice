@@ -10,26 +10,16 @@ import (
 	"github.com/bigelle/taskservice/internal/schemas"
 )
 
+// Handles /create endpoint
 func HandleCreate(w http.ResponseWriter, r *http.Request) {
-	var err error
+	var (
+		err    error
+		req    schemas.CreateRequest
+		resp   schemas.CreateResponse
+		status int
+	)
 	db := database.NewDB()
-	var resp schemas.CreateResponse
-	var status int
 
-	if r.Method != http.MethodPost {
-		status = http.StatusMethodNotAllowed
-
-		resp = schemas.CreateResponse{
-			Ok:    false,
-			Error: "method not allowed",
-		}
-		internal.WriteJSON(w, status, resp)
-
-		slog.Info("/create", "status", http.StatusText(status), "code", status)
-		return
-	}
-
-	var req schemas.CreateRequest
 	err = internal.ReadJSON(r, &req)
 	if err != nil {
 		status = http.StatusBadRequest

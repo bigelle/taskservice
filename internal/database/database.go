@@ -7,10 +7,12 @@ import (
 )
 
 var (
-	ErrNoRecord error = errors.New("no record")
+	ErrNoRecord    error = errors.New("no record")
 	ErrInvalidData error = errors.New("invalid data")
 )
 
+// A struct conttaining info about an I/O task
+// with information about the current status and a result if it's done
 type Task struct {
 	ID          uint
 	CreatedAt   time.Time
@@ -25,6 +27,7 @@ func NewDB() TaskDB {
 	return NewLocalDB()
 }
 
+// TaskDB is an intterface suitable for repository pattern
 type TaskDB interface {
 	Create(name, desc string) (uint, error)
 	View(taskID uint) (Task, error)
@@ -33,6 +36,7 @@ type TaskDB interface {
 	Delete(taskID uint) error
 }
 
+// TaskStattus is a enum describing current status of the task
 type TaskStatus int
 
 const (

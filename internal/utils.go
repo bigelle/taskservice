@@ -23,6 +23,7 @@ func NewEncoder(w io.Writer) *json.Encoder {
 	return enc
 }
 
+// Writes obj into w with status header
 func WriteJSON(w http.ResponseWriter, status int, obj any) {
 	enc := NewEncoder(w)
 
@@ -33,6 +34,7 @@ func WriteJSON(w http.ResponseWriter, status int, obj any) {
 	}
 }
 
+// Reads JSON from r.Body to dest
 func ReadJSON(r *http.Request, dest any) error {
 	dec := NewDecoder(r.Body)
 

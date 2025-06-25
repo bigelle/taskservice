@@ -10,11 +10,14 @@ import (
 	"github.com/bigelle/taskservice/internal/schemas"
 )
 
+// Handles /update endpoint
 func HandleUpdate(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var req schemas.UpdateRequest
-	var resp schemas.UpdateResponse
-	var status int
+	var (
+		err    error
+		req    schemas.UpdateRequest
+		resp   schemas.UpdateResponse
+		status int
+	)
 	db := database.NewDB()
 
 	err = internal.ReadJSON(r, &req)

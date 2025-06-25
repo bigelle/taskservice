@@ -3,17 +3,24 @@ package main
 import (
 	"log/slog"
 	"net/http"
-	
+
 	"github.com/bigelle/taskservice/internal/handlers"
+	"github.com/bigelle/taskservice/internal/server"
 )
 
 func main() {
-	mux := http.NewServeMux()
+	var serv server.Server
 	
-	mux.HandleFunc("/create", handlers.HandleCreate)
-	mux.HandleFunc("/view", handlers.HandleView)
-	mux.HandleFunc("/update", handlers.HandleUpdate)
-	mux.HandleFunc("/delete", handlers.HandleDelete)
+	serv = server.NewServerMux()
+	// works with pretty much every net/http compatible framework:
+	// serv = server.NewServerGin()
+	// serv = server.NewServerGorilla()
 
-	slog.Error(http.ListenAndServe(":8080", mux).Error())
+	serv.POST("/create", handlers.HandleCreate)
+	serv.GET("/view", handlers.HandleView)
+	serv.POST("/update", handlers.HandleUpdate)
+	serv.POST("/delete", handlers.HandleDelete)
+
+	slog.Info("Listening and serving on :8080")
+	slog.Error(http.ListenAndServe(":8080", serv).Error())
 }

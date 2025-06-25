@@ -11,11 +11,14 @@ import (
 	"github.com/bigelle/taskservice/internal/schemas"
 )
 
+// Handles /view endpoint
 func HandleView(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var req schemas.ViewRequest
-	var resp schemas.ViewResponse
-	var status int
+	var (
+		err    error
+		req    schemas.ViewRequest
+		resp   schemas.ViewResponse
+		status int
+	)
 	db := database.NewDB()
 
 	err = internal.ReadJSON(r, &req)

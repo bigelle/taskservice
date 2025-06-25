@@ -10,11 +10,14 @@ import (
 	"github.com/bigelle/taskservice/internal/schemas"
 )
 
+// Handles /delete endpoint
 func HandleDelete(w http.ResponseWriter, r *http.Request) {
-	var err error
-	var req schemas.DeleteRequest
-	var resp schemas.DeleteResponse
-	var status int
+	var (
+		err    error
+		req    schemas.DeleteRequest
+		resp   schemas.DeleteResponse
+		status int
+	)
 	db := database.NewDB()
 
 	err = internal.ReadJSON(r, &req)

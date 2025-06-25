@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// LocalDB is an in-memory database implementing TaskDB
 type LocalDB struct {
 	Tasks []Task
 	mu    sync.Mutex
@@ -134,6 +135,7 @@ var (
 	once sync.Once
 )
 
+// NewLocalDB creates a new LocalDB if it wasn't created and returns a pointer
 func NewLocalDB() *LocalDB {
 	once.Do(func() {
 		db = LocalDB{}
