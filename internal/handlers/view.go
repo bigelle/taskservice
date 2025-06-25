@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -28,12 +29,21 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 	var task database.Task
 	task, err = db.View(req.TaskID)
 	if err != nil {
-		resp = schemas.ViewResponse{
-			Ok:    false,
-			Error: "internal server error",
+		resp.Ok = false
+
+		if errors.Is(err, database.ErrInvalidData) {
+			resp.Error = "bad request"
+			internal.WriteJSON(w, http.StatusBadRequest, resp)
+			return
+		} else if errors.Is(err, database.ErrNoRecord) {
+			resp.Error = "not found"
+			internal.WriteJSON(w, http.StatusNotFound, resp)
+			return
+		} else {
+			resp.Error = "internal server error"
+			internal.WriteJSON(w, http.StatusInternalServerError, resp)
+			return
 		}
-		internal.WriteJSON(w, http.StatusBadRequest, resp)
-		return
 	}
 
 	resp = schemas.ViewResponse{
@@ -48,7 +58,7 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	if task.Result != nil && (task.Status == database.StatusSuccess || task.Status == database.StatusFail) {
+	if task.Status == database.StatusSuccess || task.Status == database.StatusFail {
 		resp.Task.Took = internal.FormatTime(time.Since(task.CreatedAt))
 		if task.Status == database.StatusSuccess {
 			resp.Task.Result = *task.Result

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bigelle/taskservice/internal"
@@ -26,12 +27,21 @@ func HandleDelete(w http.ResponseWriter, r *http.Request) {
 
 	err = db.Delete(req.TaskID)
 	if err != nil {
-		resp = schemas.DeleteResponse{
-			Ok:    false,
-			Error: "internal server error",
+		resp.Ok = false
+
+		if errors.Is(err, database.ErrInvalidData) {
+			resp.Error = "bad request"
+			internal.WriteJSON(w, http.StatusBadRequest, resp)
+			return
+		} else if errors.Is(err, database.ErrNoRecord) {
+			resp.Error = "not found"
+			internal.WriteJSON(w, http.StatusNotFound, resp)
+			return
+		} else {
+			resp.Error = "internal server error"
+			internal.WriteJSON(w, http.StatusInternalServerError, resp)
+			return
 		}
-		internal.WriteJSON(w, http.StatusInternalServerError, resp)
-		return
 	}
 
 	resp = schemas.DeleteResponse{Ok: true}

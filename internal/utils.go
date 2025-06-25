@@ -29,6 +29,7 @@ func WriteJSON(w http.ResponseWriter, status int, obj any) {
 
 	w.WriteHeader(status)
 	if err := enc.Encode(obj); err != nil {
+		fmt.Printf("Encode failed: %v\n", err)
 		slog.Error(fmt.Sprintf("writing response: %v", err))
 	}
 }

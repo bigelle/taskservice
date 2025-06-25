@@ -2,7 +2,13 @@ package database
 
 import (
 	"encoding/json"
+	"errors"
 	"time"
+)
+
+var (
+	ErrNoRecord error = errors.New("no record")
+	ErrInvalidData error = errors.New("invalid data")
 )
 
 type Task struct {

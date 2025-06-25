@@ -1,14 +1,14 @@
 package schemas
 
 type CreateRequest struct {
-	TaskName       string `json:"task_name"`
-	TaskDesciption string `json:"task_desciption"`
+	TaskName       string `json:"name"`
+	TaskDesciption string `json:"description"`
 }
 
 type CreateResponse struct {
-	Ok         bool   `json:"ok"`
-	TaskID     uint   `json:"task_id,omitempty"`
-	TaskName   string `json:"task_name,omitempty"`
-	TaskStatus string `json:"task_status,omitempty"`
-	Error      string `json:"error,omitempty"`
+	Ok     bool   `json:"ok"`
+	ID     uint   `json:"id,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Status string `json:"status,omitempty"`
+	Error  string `json:"error,omitempty"`
 }

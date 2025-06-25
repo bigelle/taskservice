@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 
 	"github.com/bigelle/taskservice/internal"
@@ -27,23 +28,41 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	var task database.Task
 	task, err = db.UpdateStatus(req.TaskID, req.NewStatus)
 	if err != nil {
-		resp = schemas.UpdateResponse{
-			Ok:    false,
-			Error: "internal server error",
+		resp.Ok = false
+
+		if errors.Is(err, database.ErrInvalidData) {
+			resp.Error = "bad request"
+			internal.WriteJSON(w, http.StatusBadRequest, resp)
+			return
+		} else if errors.Is(err, database.ErrNoRecord) {
+			resp.Error = "not found"
+			internal.WriteJSON(w, http.StatusNotFound, resp)
+			return
+		} else {
+			resp.Error = "internal server error"
+			internal.WriteJSON(w, http.StatusInternalServerError, resp)
+			return
 		}
-		internal.WriteJSON(w, http.StatusInternalServerError, resp)
-		return
 	}
 
 	if req.Result != "" {
 		task, err = db.UpdateResult(req.TaskID, req.Result)
 		if err != nil {
-			resp = schemas.UpdateResponse{
-				Ok:    false,
-				Error: "internal server error",
+			resp.Ok = false
+
+			if errors.Is(err, database.ErrInvalidData) {
+				resp.Error = "bad request"
+				internal.WriteJSON(w, http.StatusBadRequest, resp)
+				return
+			} else if errors.Is(err, database.ErrNoRecord) {
+				resp.Error = "not found"
+				internal.WriteJSON(w, http.StatusNotFound, resp)
+				return
+			} else {
+				resp.Error = "internal server error"
+				internal.WriteJSON(w, http.StatusInternalServerError, resp)
+				return
 			}
-			internal.WriteJSON(w, http.StatusInternalServerError, resp)
-			return
 		}
 	}
 
@@ -54,4 +73,3 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 	internal.WriteJSON(w, http.StatusOK, resp)
 }
-
