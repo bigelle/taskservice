@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 
 	"github.com/bigelle/taskservice/internal"
@@ -13,15 +14,20 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var req schemas.UpdateRequest
 	var resp schemas.UpdateResponse
+	var status int
 	db := database.NewDB()
 
 	err = internal.ReadJSON(r, &req)
 	if err != nil {
+		status = http.StatusBadRequest
+
 		resp = schemas.UpdateResponse{
 			Ok:    false,
 			Error: "bad request",
 		}
-		internal.WriteJSON(w, http.StatusBadRequest, resp)
+		internal.WriteJSON(w, status, resp)
+
+		slog.Info("/update", "status", http.StatusText(status), "code", status)
 		return
 	}
 
@@ -31,18 +37,24 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		resp.Ok = false
 
 		if errors.Is(err, database.ErrInvalidData) {
+			status = http.StatusBadRequest
+
 			resp.Error = "bad request"
-			internal.WriteJSON(w, http.StatusBadRequest, resp)
-			return
+			internal.WriteJSON(w, status, resp)
+
 		} else if errors.Is(err, database.ErrNoRecord) {
+			status = http.StatusNotFound
+
 			resp.Error = "not found"
-			internal.WriteJSON(w, http.StatusNotFound, resp)
-			return
+			internal.WriteJSON(w, status, resp)
 		} else {
+			status = http.StatusNotFound
+
 			resp.Error = "internal server error"
-			internal.WriteJSON(w, http.StatusInternalServerError, resp)
-			return
+			internal.WriteJSON(w, status, resp)
 		}
+		slog.Info("/update", "status", http.StatusText(status), "code", status)
+		return
 	}
 
 	if req.Result != "" {
@@ -51,25 +63,34 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 			resp.Ok = false
 
 			if errors.Is(err, database.ErrInvalidData) {
+				status = http.StatusBadRequest
+
 				resp.Error = "bad request"
-				internal.WriteJSON(w, http.StatusBadRequest, resp)
-				return
+				internal.WriteJSON(w, status, resp)
+
 			} else if errors.Is(err, database.ErrNoRecord) {
+				status = http.StatusNotFound
+
 				resp.Error = "not found"
-				internal.WriteJSON(w, http.StatusNotFound, resp)
-				return
+				internal.WriteJSON(w, status, resp)
 			} else {
+				status = http.StatusNotFound
+
 				resp.Error = "internal server error"
-				internal.WriteJSON(w, http.StatusInternalServerError, resp)
-				return
+				internal.WriteJSON(w, status, resp)
 			}
+			slog.Info("/update", "status", http.StatusText(status), "code", status)
+			return
 		}
 	}
 
+	status = http.StatusOK
 	resp = schemas.UpdateResponse{
 		Ok:     true,
-		ID: task.ID,
+		ID:     task.ID,
 		Status: task.Status.String(),
 	}
-	internal.WriteJSON(w, http.StatusOK, resp)
+	internal.WriteJSON(w, status, resp)
+
+	slog.Info("/update", "status", http.StatusText(status), "code", status)
 }

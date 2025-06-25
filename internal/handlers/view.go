@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"errors"
+	"log/slog"
 	"net/http"
 	"time"
 
@@ -14,15 +15,21 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var req schemas.ViewRequest
 	var resp schemas.ViewResponse
+	var status int
 	db := database.NewDB()
 
 	err = internal.ReadJSON(r, &req)
 	if err != nil {
+		status = http.StatusBadRequest
+
 		resp = schemas.ViewResponse{
 			Ok:    false,
 			Error: "bad request",
 		}
-		internal.WriteJSON(w, http.StatusBadRequest, resp)
+		internal.WriteJSON(w, status, resp)
+
+		slog.Info("/view", "status", http.StatusText(status), "code", status)
+
 		return
 	}
 
@@ -32,19 +39,29 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 		resp.Ok = false
 
 		if errors.Is(err, database.ErrInvalidData) {
+			status = http.StatusBadRequest
+
 			resp.Error = "bad request"
-			internal.WriteJSON(w, http.StatusBadRequest, resp)
-			return
+			internal.WriteJSON(w, status, resp)
+
 		} else if errors.Is(err, database.ErrNoRecord) {
+			status = http.StatusNotFound
+
 			resp.Error = "not found"
-			internal.WriteJSON(w, http.StatusNotFound, resp)
-			return
+			internal.WriteJSON(w, status, resp)
+
 		} else {
+			status = http.StatusInternalServerError
+
 			resp.Error = "internal server error"
-			internal.WriteJSON(w, http.StatusInternalServerError, resp)
-			return
+			internal.WriteJSON(w, status, resp)
 		}
+
+		slog.Info("/view", "status", http.StatusText(status), "code", status)
+		return
 	}
+
+	status = http.StatusOK
 
 	resp = schemas.ViewResponse{
 		Ok: true,
@@ -59,11 +76,12 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if task.Status == database.StatusSuccess || task.Status == database.StatusFail {
-		resp.Task.Took = internal.FormatTime(time.Since(task.CreatedAt))
+		resp.Task.Took = time.Since(task.CreatedAt).String()
 		if task.Status == database.StatusSuccess {
 			resp.Task.Result = *task.Result
 		}
 	}
 
-	internal.WriteJSON(w, http.StatusOK, resp)
+	internal.WriteJSON(w, status, resp)
+	slog.Info("/view", "status", http.StatusText(status), "code", status)
 }
