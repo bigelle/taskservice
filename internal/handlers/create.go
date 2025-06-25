@@ -39,8 +39,8 @@ func HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	var taskID uint
 	taskID, err = db.Create(
-		req.TaskName,
-		req.TaskDesciption,
+		req.Name,
+		req.Desciption,
 	)
 	if err != nil {
 		slog.Error(err.Error())
@@ -62,7 +62,7 @@ func HandleCreate(w http.ResponseWriter, r *http.Request) {
 
 	resp = schemas.CreateResponse{
 		Ok:   true,
-		Name: req.TaskName,
+		Name: req.Name,
 		ID:   taskID,
 	}
 	internal.WriteJSON(w, http.StatusOK, resp)

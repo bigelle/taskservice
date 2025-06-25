@@ -25,7 +25,7 @@ func HandleDelete(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.Delete(req.TaskID)
+	err = db.Delete(req.ID)
 	if err != nil {
 		resp.Ok = false
 

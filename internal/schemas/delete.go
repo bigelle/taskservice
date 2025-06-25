@@ -1,7 +1,7 @@
 package schemas
 
 type DeleteRequest struct {
-	TaskID uint `json:"task_id"`
+	ID uint `json:"id"`
 }
 
 type DeleteResponse struct {

@@ -1,8 +1,8 @@
 package schemas
 
 type CreateRequest struct {
-	TaskName       string `json:"name"`
-	TaskDesciption string `json:"description"`
+	Name       string `json:"name"`
+	Desciption string `json:"description"`
 }
 
 type CreateResponse struct {

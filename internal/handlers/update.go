@@ -26,7 +26,7 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var task database.Task
-	task, err = db.UpdateStatus(req.TaskID, req.NewStatus)
+	task, err = db.UpdateStatus(req.ID, req.NewStatus)
 	if err != nil {
 		resp.Ok = false
 
@@ -46,7 +46,7 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if req.Result != "" {
-		task, err = db.UpdateResult(req.TaskID, req.Result)
+		task, err = db.UpdateResult(req.ID, req.Result)
 		if err != nil {
 			resp.Ok = false
 
@@ -68,7 +68,7 @@ func HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	resp = schemas.UpdateResponse{
 		Ok:     true,
-		TaskID: task.ID,
+		ID: task.ID,
 		Status: task.Status.String(),
 	}
 	internal.WriteJSON(w, http.StatusOK, resp)

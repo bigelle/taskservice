@@ -27,7 +27,7 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var task database.Task
-	task, err = db.View(req.TaskID)
+	task, err = db.View(req.ID)
 	if err != nil {
 		resp.Ok = false
 
@@ -52,8 +52,8 @@ func HandleView(w http.ResponseWriter, r *http.Request) {
 			ID:          task.ID,
 			Name:        task.Name,
 			Description: task.Description,
-			CreatedAt:   task.CreatedAt,
-			UpdatedAt:   task.UpdatedAt,
+			CreatedAt:   task.CreatedAt.UTC().Format(time.RFC1123),
+			UpdatedAt:   task.UpdatedAt.UTC().Format(time.RFC1123),
 			Status:      task.Status.String(),
 		},
 	}

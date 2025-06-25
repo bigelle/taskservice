@@ -1,9 +1,7 @@
 package schemas
 
-import "time"
-
 type ViewRequest struct {
-	TaskID uint `json:"task_id"`
+	ID uint `json:"id"`
 }
 
 type ViewResponse struct {
@@ -13,12 +11,12 @@ type ViewResponse struct {
 }
 
 type Task struct {
-	ID          uint      `json:"id"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	Status      string    `json:"status"`
-	CreatedAt   time.Time `json:"created_at,omitzero"`
-	UpdatedAt   time.Time `json:"updated_at,omitzero"`
-	Result      string    `json:"result,omitempty"`
-	Took        string    `json:"took,omitempty"`
+	ID          uint   `json:"id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Status      string `json:"status"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+	Result      string `json:"result,omitempty"`
+	Took        string `json:"took,omitempty"`
 }
